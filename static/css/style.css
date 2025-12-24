@@ -1,0 +1,28 @@
+h4 {
+    color: purple; 
+    padding-left: 20px; 
+}
+
+body {
+    background-color: #3697f8; 
+}
+
+.container {
+    background-color: rgb(156, 156, 156);
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+}
+
+.navbar-brand {
+    font-weight: bold;
+}
+
+.table th {
+    background-color: #e9ecef;
+}
+
+.btn {
+    margin-right: 5px;
+    margin-bottom: 5px;
+}

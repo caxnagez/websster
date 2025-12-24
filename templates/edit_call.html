@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>Edit Call #{{ call.id }}</h1>
+<form method="POST">
+    {{ form.hidden_tag() }}
+    <div class="mb-3">
+        {{ form.location.label(class="form-label") }}
+        {{ form.location(class="form-control", value=call.location) }}
+        {% if form.location.errors %}
+            <div class="text-danger">
+                {% for error in form.location.errors %}
+                    <small>{{ error }}</small>
+                {% endfor %}
+            </div>
+        {% endif %}
+    </div>
+    <div class="mb-3">
+        {{ form.description.label(class="form-label") }}
+        {{ form.description(class="form-control", rows="4", value=call.description) }}
+         {% if form.description.errors %}
+            <div class="text-danger">
+                {% for error in form.description.errors %}
+                    <small>{{ error }}</small>
+                {% endfor %}
+            </div>
+        {% endif %}
+    </div>
+    <div class="mb-3">
+        {{ form.departments.label(class="form-label") }}
+        {{ form.departments(class="form-select", multiple=True) }}
+         {% if form.departments.errors %}
+            <div class="text-danger">
+                {% for error in form.departments.errors %}
+                    <small>{{ error }}</small>
+                {% endfor %}
+            </div>
+        {% endif %}
+        <small class="form-text text-muted">Hold Ctrl (Cmd on Mac) to select multiple departments.</small>
+    </div>
+    {{ form.submit(class="btn btn-primary") }}
+</form>
+<a href="{{ url_for('call_detail', id=call.id) }}" class="btn btn-secondary">Cancel</a>
+
+<div class="mt-4">
+    <h5>Call Information</h5>
+    <p><strong>Created at (UTC):</strong> {{ call.creation_date.strftime('%Y-%m-%d %H:%M:%S') if call.creation_date else 'N/A' }}</p>
+    <p><strong>Created by:</strong> {{ call.creator.username if call.creator else 'Unknown' }}</p>
+</div>
+{% endblock %}

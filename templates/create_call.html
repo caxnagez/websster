@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>Dispatch Emergency Call</h1>
+<form method="POST">
+    {{ form.hidden_tag() }}
+    <div class="mb-3">
+        {{ form.location.label(class="form-label") }}
+        {{ form.location(class="form-control") }}
+        {% if form.location.errors %}
+            <div class="text-danger">
+                {% for error in form.location.errors %}
+                    <small>{{ error }}</small>
+                {% endfor %}
+            </div>
+        {% endif %}
+    </div>
+    <div class="mb-3">
+        {{ form.description.label(class="form-label") }}
+        {{ form.description(class="form-control", rows="4") }}
+         {% if form.description.errors %}
+            <div class="text-danger">
+                {% for error in form.description.errors %}
+                    <small>{{ error }}</small>
+                {% endfor %}
+            </div>
+        {% endif %}
+    </div>
+    <div class="mb-3">
+        {{ form.departments.label(class="form-label") }}
+        {{ form.departments(class="form-select", multiple=True) }}
+         {% if form.departments.errors %}
+            <div class="text-danger">
+                {% for error in form.departments.errors %}
+                    <small>{{ error }}</small>
+                {% endfor %}
+            </div>
+        {% endif %}
+        <small class="form-text text-muted">Hold Ctrl to select multiple departments.</small>
+    </div>
+    {{ form.submit(class="btn btn-success") }}
+</form>
+<a href="{{ url_for('index') }}" class="btn btn-secondary">Back to Calls</a>
+{% endblock %}

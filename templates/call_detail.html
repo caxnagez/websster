@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="card mb-4">
+    <div class="card-body">
+        <h1>Emergency Call Details #{{ call.id }}</h1>
+        <p><strong>Location:</strong> {{ call.location }}</p>
+        <p><strong>Description:</strong> {{ call.description }}</p>
+        <p><strong>Reported by:</strong> {{ call.creator.username if call.creator else 'Unknown' }}</p>
+        <p><strong>Departments:</strong>
+            {% for dept in call.departments %}
+                <span class="badge bg-secondary">{{ dept.name|title }}</span>
+            {% endfor %}
+        </p>
+        <p><strong>Created at (UTC):</strong> {{ call.creation_date.strftime('%Y-%m-%d %H:%M:%S') if call.creation_date else 'N/A' }}</p>
+
+        <h5>Department Statuses:</h5>
+        <ul class="list-group list-group-flush">
+            {% for dept_name, status in statuses_by_dept.items() %}
+                <li class="list-group-item">
+                    <strong>{{ dept_name|title }}:</strong>
+                    <span id="status-badge-{{ dept_name }}" class="badge {% if status == 'closed' %}bg-success{% elif status in ['on_way', 'arrived'] %}bg-warning{% else %}bg-info{% endif %}">
+                        {{ status|title }}
+                    </span>
+                </li>
+            {% endfor %}
+        </ul>
+
+        <div class="mt-3">
+            {% if current_user.role in ['medical', 'fire', 'police'] and current_user.role in call.departments|map(attribute='name')|list %}
+                <h5>Update Your Status:</h5>
+                <form method="POST" action="{{ url_for('update_call_status', id=call.id) }}" class="status-update-form" data-call-id="{{ call.id }}" data-department="{{ current_user.role }}">
+                    <select name="status" class="form-select d-inline w-auto me-2">
+                        <option value="open" {% if statuses_by_dept.get(current_user.role) == 'open' %}selected{% endif %}>Open</option>
+                        <option value="dispatched" {% if statuses_by_dept.get(current_user.role) == 'dispatched' %}selected{% endif %}>Dispatched</option>
+                        <option value="on_way" {% if statuses_by_dept.get(current_user.role) == 'on_way' %}selected{% endif %}>On Way</option>
+                        <option value="arrived" {% if statuses_by_dept.get(current_user.role) == 'arrived' %}selected{% endif %}>Arrived</option>
+                        <option value="closed" {% if statuses_by_dept.get(current_user.role) == 'closed' %}selected{% endif %}>Closed</option>
+                    </select>
+                    <button type="submit" class="btn btn-primary">Update Status</button>
+                </form>
+            {% endif %}
+            {% if current_user.role == 'admin' %}
+                <div class="mt-3">
+                    <form method="POST" action="{{ url_for('delete_call', id=call.id) }}" style="display:inline;" onsubmit="return confirm('Are you sure you want to delete call #{{ call.id }}? This action cannot be undone.')">
+                        <button type="submit" class="btn btn-danger">Delete Call</button>
+                    </form>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+    {{ super() }} 
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+{% endblock %}

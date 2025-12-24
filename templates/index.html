@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="card mb-4">
+    <div class="card-body">
+        <h1>Emergency Calls</h1>
+        {% if current_user.is_authenticated %}
+            {% if current_user.role == 'admin' %}
+                <h3>All Calls (Admin View)</h3>
+            {% elif current_user.role == 'dispatcher' %}
+                <h3>All Calls (Dispatcher View)</h3>
+            {% elif current_user.role in ['medical', 'fire', 'police'] %}
+                <h3>Calls for {{ current_user.role|title }} Department</h3>
+            {% endif %}
+            <a href="{{ url_for('auth.logout') }}" class="btn btn-warning mt-2">Logout</a>
+        {% else %}
+            <h3>Available Calls (Anonymous View - Likely Empty)</h3>
+        {% endif %}
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-body">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Location</th>
+                    <th>Description</th>
+                    <th>Created By</th>
+                    <th>Departments</th>
+                    <th>Statuses by Department</th>
+                    <th>Created At (UTC)</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for call in calls %}
+                <tr>
+                    <td>{{ call.id }}</td>
+                    <td>{{ call.location }}</td>
+                    <td>{{ call.description[:50] }}{% if call.description|length > 50 %}...{% endif %}</td>
+                    <td>{{ call.creator.username if call.creator else 'Unknown' }}</td>
+                    <td>
+                        {% for dept in call.departments %}
+                            <span class="badge bg-secondary">{{ dept.name|title }}</span>
+                        {% endfor %}
+                    </td>
+                    <td>
+                        {% for dept_status in call.statuses %}
+                            <div>
+                                <small><strong>{{ dept_status.department.name|title }}:</strong>
+                                <span class="badge {% if dept_status.status == 'closed' %}bg-success{% elif dept_status.status in ['on_way', 'arrived'] %}bg-warning{% else %}bg-info{% endif %}">
+                                    {{ dept_status.status|title }}
+                                </span></small>
+                            </div>
+                        {% endfor %}
+                        {% if not call.statuses %}
+                            <small>No statuses set.</small>
+                        {% endif %}
+                    </td>
+                    <td>{{ call.creation_date.strftime('%Y-%m-%d %H:%M:%S') if call.creation_date else 'N/A' }}</td>
+                    <td>
+                        <a href="{{ url_for('call_detail', id=call.id) }}" class="btn btn-info btn-sm">View Details</a>
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="8">No calls found.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        {% if current_user.is_authenticated and current_user.role == 'dispatcher' %}
+            <a href="{{ url_for('create_call') }}" class="btn btn-success mt-2">Create New Call</a>
+        {% endif %}
+    </div>
+</div>
+
+{% endblock %}
