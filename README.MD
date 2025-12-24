@@ -36,7 +36,7 @@
 
 1.  Клонируйте репозиторий:
 
-    git clone https://github.com/caxnagez/webproject
+    git clone https://github.com/caxnagez/websster
 
 2.  (Опционально) Создайте и активируйте виртуальное окружение:
 
